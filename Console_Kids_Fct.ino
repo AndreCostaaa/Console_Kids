@@ -3,7 +3,7 @@
 
 void initPins()
 {
-  for(int i = 0; i < NB_LEDS; i++)
+  for (int i = 0; i < NB_LEDS; i++)
   {
     led_arr[i]->begin();
   }
@@ -12,7 +12,7 @@ void initPins()
   pinMode(BTN_B_PIN, INPUT_PULLUP);
   pinMode(BTN_C_PIN, INPUT_PULLUP);
   pinMode(BTN_D_PIN, INPUT_PULLUP);
-  
+  matrix.begin(0x70);
 }
 ButtonPressedEnum getButtonPressed()
 {
@@ -44,4 +44,19 @@ ButtonPressedEnum getButtonPressed()
   }
   return NONE;
 
+}
+
+void set_matrix(int data[8][8])
+{
+  matrix.clear();
+  matrix.setRotation(0);
+  for (int i = 0; i < 8; i++)
+  {
+    for (int j = 0; j < 8; j++)
+    {
+      matrix.drawPixel(i, j, data[i][j] );
+    }
+  }
+  matrix.writeDisplay();
+  return CONTINUE;
 }

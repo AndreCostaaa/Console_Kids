@@ -29,14 +29,14 @@ GameProgressEnum reaction(ButtonPressedEnum btn)
       {
         led_yellow.setOff();
       }
-      
+
       if (btn == BTN_A)
       {
         game_state = START;
-        Serial.print("Start");
+        Serial.println("Start");
         start_timer.start(random(100, 500));
         led_green.setOff();
-        led_blue.setOff();
+        led_yellow.setOff();
       }
       else if (btn == BTN_B || btn == BTN_C)
       {
@@ -69,11 +69,11 @@ GameProgressEnum reaction(ButtonPressedEnum btn)
           }
           break;
         case TWO_PLAYERS:
-          if (btn == BTN_A || btn == BTN_B)
+          if ((btn == BTN_A || btn == BTN_B) && reaction_time_p1 == 0)
           {
             reaction_time_p1 = millis() - start_time;
           }
-          if (btn == BTN_C || btn == BTN_D)
+          if ((btn == BTN_C || btn == BTN_D) && reaction_time_p2 == 0)
           {
             reaction_time_p2 = millis() - start_time;
           }
@@ -102,15 +102,41 @@ GameProgressEnum reaction(ButtonPressedEnum btn)
       }
       break;
     case GAME_OVER:
-
-      if (btn == BTN_D)
+      if (winner == 1)
       {
-        game_state = SET_GAME_MODE;
-        return QUIT;
+        led_green.setOn();
+        led_red.setOn();
+        led_yellow.setOff();
+        led_blue.setOff();
       }
-      else if (btn != NONE)
+      else if (winner == 2)
       {
+        led_green.setOff();
+        led_red.setOff();
+        led_yellow.setOn();
+        led_blue.setOn();
+      }
+      else
+      {
+        led_red.setOff();
+        led_green.setOn();
+        led_yellow.setOff();
+        led_blue.setOn();
+      }
+      if (btn != NONE)
+      {
+        reaction_time_p1 = 0;
+        reaction_time_p2 = 0;
+        winner = 0;
         game_state = SET_GAME_MODE;
+        for(int i= 0; i< NB_LEDS; i++)
+        {
+          led_arr[i]->setOff();
+        }
+        if (btn == BTN_D)
+        {
+          return QUIT;
+        }
       }
       break;
   }

@@ -20,6 +20,11 @@
 
 #define MIC_PIN 7
 
+#define OFF 0
+#define RED 1
+#define YELLOW 2
+#define GREEN 3
+
 typedef enum
 {
   SEQUENCE,
@@ -56,8 +61,7 @@ typedef enum
 void initPins();
 
 ButtonPressedEnum getButtonPressed();
-
-bool isTimerOver(TimerEnum timer);
+void set_matrix(int data[8][8]);
 
 Led led_red = Led(LED_RED_PIN);
 Led led_green = Led(LED_GREEN_PIN);
@@ -65,4 +69,5 @@ Led led_yellow = Led(LED_YELLOW_PIN);
 Led led_blue = Led(LED_BLUE_PIN);
 
 Led* led_arr[NB_LEDS] = {&led_red, &led_green, &led_yellow, &led_blue};
+
 #endif

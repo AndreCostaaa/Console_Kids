@@ -101,13 +101,11 @@ GameProgressEnum sequence(ButtonPressedEnum btn)
             {
               led_green.setOn(200);
               index++;
-              Serial.println("correct");
             }
             else
             {
               led_red.setOn(1000);
               game_state = GAME_OVER;
-              Serial.println("game over");
             }
             break;
           case BTN_B:
@@ -115,13 +113,11 @@ GameProgressEnum sequence(ButtonPressedEnum btn)
             {
               led_green.setOn(200);
               index++;
-              Serial.println("correct");
             }
             else
             {
               led_red.setOn(1000);
               game_state = GAME_OVER;
-              Serial.println("game over");
             }
             break;
           case BTN_C:
@@ -157,14 +153,13 @@ GameProgressEnum sequence(ButtonPressedEnum btn)
     case GAME_OVER:
       DisplayEndLedSequence(new_state);
       //display plays
-      if (btn == BTN_D)
+      if (btn != NONE)
       {
         game_state = START;
-        return QUIT;
-      }
-      else if (btn != NONE)
-      {
-        game_state = START;
+        if (btn == BTN_D)
+        {
+          return QUIT;
+        }
       }
       break;
   }

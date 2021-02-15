@@ -2,7 +2,14 @@
 #include "Timer.h"
 #include "Games.h"
 
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include "Adafruit_LEDBackpack.h"
+
+Adafruit_BicolorMatrix matrix = Adafruit_BicolorMatrix();
+
 Timer anti_rebond = Timer();
+
 void setup() {
   initPins();
   Serial.begin(115200);
@@ -18,8 +25,9 @@ GameProgressEnum (*game_func_arr[])(ButtonPressedEnum) = {tic_tac_toe, four_in_a
 
 
 void loop() {
+  
   static ConsoleStateEnum state = SELECTING;
-  static int game_index = 2;
+  static int game_index = 0;
 
   ButtonPressedEnum btn = NONE;
   if (anti_rebond.isDone())
@@ -37,6 +45,7 @@ void loop() {
         Serial.print("Playing: ");
         Serial.println(game_index);
         state = PLAYING;
+        led_arr[game_index]->setOff();
       }
       else if (btn == BTN_B || btn == BTN_C ) //previous game
       {
