@@ -3,8 +3,7 @@
 #ifndef Games_h
 #define Games_h
 
-
-typedef enum
+typedef enum GameStateEnum
 {
   SET_GAME_MODE,
   PLAYER_1,
@@ -12,18 +11,25 @@ typedef enum
   GAME_OVER,
   START,
   WAIT,
-  DISPLAY_SEQUENCE
+  DISPLAY_SEQUENCE,
+  GAMING,
+  GAME_OVER_CROWN //Easter Egg
 }GameStateEnum;
 
 
-typedef enum
+typedef enum GameModeEnum
 {
   ONE_PLAYER,
   TWO_PLAYERS
 }GameModeEnum;
 
-GameProgressEnum reaction(ButtonPressedEnum btn);
-GameProgressEnum four_in_a_row(ButtonPressedEnum btn);
-GameProgressEnum sequence(ButtonPressedEnum btn);
-GameProgressEnum tic_tac_toe(ButtonPressedEnum btn);
+#define GOOD_REACTION_TIME 250
+#define BAD_REACTION_TIME 750
+#define TIME_TO_PLAY_SEQUENCE 5000
+#define PLAYS_MAX 64
+
+GameProgressEnum reaction();
+GameProgressEnum four_in_a_row();
+GameProgressEnum sequence();
+GameProgressEnum tic_tac_toe();
 #endif

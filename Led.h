@@ -6,9 +6,9 @@
 class Led
 {
   private:
-    boolean state;
+    bool state;
     int pin;
-    boolean timer_set;
+    bool  timer_set;
     Timer timer = Timer();
     void set();
   public:

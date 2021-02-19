@@ -1,6 +1,6 @@
 #include "Games.h"
 #include "Console_Kids.h"
-GameProgressEnum four_in_a_row(ButtonPressedEnum btn)
+GameProgressEnum four_in_a_row()
 {
   static GameStateEnum game_state = PLAYER_1;
   Serial.println("four");
@@ -11,5 +11,6 @@ GameProgressEnum four_in_a_row(ButtonPressedEnum btn)
     case PLAYER_2:
       break;
   }
+  update_leds();
   return CONTINUE;
 }

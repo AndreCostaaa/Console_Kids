@@ -6,15 +6,15 @@ class Timer
   private:
     unsigned long start_time;
     unsigned long timer;
-    boolean is_set;
-    boolean auto_restart = false;
+    bool is_set;
+    bool auto_restart = false;
     
   public:
     Timer();
     bool isDone();
     void restart();
     void start(unsigned long duration);
-    bool get_set();
+    bool get_started();
     void set_auto_restart(bool b);
 };
 

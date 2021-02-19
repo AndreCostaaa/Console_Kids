@@ -1,5 +1,5 @@
 #include "Timer.h"
-
+#include <Arduino.h>
 Timer::Timer()
 {
   start_time = millis();
@@ -33,7 +33,7 @@ void Timer::start(unsigned long duration)
   timer = duration;
   is_set = true;
 }
-bool Timer::get_set()
+bool Timer::get_started()
 {
   return is_set;
 }

@@ -1,5 +1,8 @@
 
 #include "Led.h"
+#include <Arduino.h>
+
+
 #ifndef Console_Kids_h
 #define Console_Kids_h
 
@@ -25,12 +28,14 @@
 #define YELLOW 2
 #define GREEN 3
 
+#define MATRIX_ROWS 8
+
 typedef enum
 {
   SEQUENCE,
   TIC_TAC_TOE,
   FOUR_IN_A_ROW
-}GameEnum;
+} GameEnum;
 
 typedef enum
 {
@@ -39,35 +44,79 @@ typedef enum
   BTN_B,
   BTN_C,
   BTN_D
-}ButtonPressedEnum;
+} ButtonPressedEnum;
 
 typedef enum
 {
   ANTI_REBOND
-}TimerEnum;
+} TimerEnum;
 
 typedef enum
 {
   SELECTING,
   PLAYING
-}ConsoleStateEnum;
+} ConsoleStateEnum;
 
 typedef enum
 {
   CONTINUE,
-  QUIT
-}GameProgressEnum;
+  QUIT,
+  RESTART
+} GameProgressEnum;
 
-void initPins();
+const uint8_t GAME_PREVIEW_ARR[4][8][8] =
+{
+  {
+    {1, 1, 2, 0, 0, 2, 0, 0},
+    {1, 1, 2, 0, 0, 2, 0, 0},
+    {2, 2, 2, 2, 2, 2, 2, 2},
+    {0, 0, 2, 3, 3, 2, 0, 0},
+    {0, 0, 2, 3, 3, 2, 0, 0},
+    {2, 2, 2, 2, 2, 2, 2, 2},
+    {0, 0, 2, 0, 0, 2, 1, 1},
+    {0, 0, 2, 0, 0, 2, 1, 1}
+  },
+  {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 3, 0, 0},
+    {0, 0, 3, 0, 0, 3, 0, 0},
+    {0, 0, 3, 0, 0, 3, 0, 0},
+    {0, 0, 1, 1, 1, 1, 0, 0},
+    {0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 1, 0, 0, 0, 0, 0},
+    {0, 0, 1, 0, 0, 0, 0, 0}
+  },
+  {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 3, 3, 3, 3, 0, 0},
+    {0, 0, 0, 0, 0, 3, 0, 0},
+    {0, 0, 0, 0, 0, 3, 0, 0},
+    {0, 0, 3, 3, 3, 3, 0, 0},
+    {0, 0, 3, 0, 0, 0, 0, 0},
+    {0, 0, 3, 0, 0, 0, 0, 0},
+    {0, 0, 3, 3, 3, 3, 0, 0}
+  },
+  {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 1, 1, 1, 1, 0, 0},
+    {0, 1, 0, 0, 0, 1, 0, 0},
+    {0, 1, 0, 0, 0, 1, 0, 0},
+    {0, 0, 1, 1, 1, 1, 0, 0},
+    {0, 0, 0, 1, 0, 1, 0, 0},
+    {0, 0, 1, 0, 0, 1, 0, 0},
+    {0, 1, 0, 0, 0, 1, 0, 0}
+  }
+};
 
+void init_();
 ButtonPressedEnum getButtonPressed();
-void set_matrix(int data[8][8]);
+void update_leds();
+void set_matrix(uint8_t data[8][8]);
+void set_crown(uint8_t data[8][8]);
 
-Led led_red = Led(LED_RED_PIN);
-Led led_green = Led(LED_GREEN_PIN);
-Led led_yellow = Led(LED_YELLOW_PIN);
-Led led_blue = Led(LED_BLUE_PIN);
-
-Led* led_arr[NB_LEDS] = {&led_red, &led_green, &led_yellow, &led_blue};
-
+extern Led led_red;
+extern Led led_green;
+extern Led led_yellow;
+extern Led led_blue;
+extern Led* led_arr[NB_LEDS];
 #endif
