@@ -6,7 +6,7 @@ static void set_matrix_array(uint8_t matrix_arr[8][8], int pos);
 
 GameProgressEnum sequence()
 {
-  int8_t sequence_arr[PLAYS_MAX];
+  int8_t sequence_arr[PLAYS_MAX_SEQUENCE];
   GameStateEnum old_game_state = SET_GAME_MODE;
   GameStateEnum game_state = START;
   int index = 0;
@@ -26,7 +26,7 @@ GameProgressEnum sequence()
     switch (game_state)
     {
     case START:
-      memset(sequence_arr, -1, sizeof(sequence_arr[0]) * PLAYS_MAX);
+      memset(sequence_arr, -1, sizeof(sequence_arr[0]) * PLAYS_MAX_SEQUENCE);
 
       DisplayStartLedSequence(new_state);
 
@@ -95,7 +95,7 @@ GameProgressEnum sequence()
             index = 0;
             plays++;
             set_matrix_array(matrix_arr, plays - 1);
-            if (plays >= PLAYS_MAX)
+            if (plays >= PLAYS_MAX_SEQUENCE)
             {
               game_state = GAME_OVER_CROWN;
             }

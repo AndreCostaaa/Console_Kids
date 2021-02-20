@@ -1,9 +1,6 @@
 #include "Games.h"
 #include "Console_Kids.h"
 
-#define P1 (uint8_t) 0
-#define P2 (uint8_t) 1
-
 static void next_position(uint8_t* pos);
 static void set_position(uint8_t pos, uint8_t player);
 static void set_matrix_arr(uint8_t arr[8][8], uint8_t pos, uint8_t clr);
@@ -11,7 +8,6 @@ static uint8_t check_winner();
 static void get_winning_positions(int8_t *positions, uint8_t winner);
 static int get_position(uint8_t x, uint8_t y);
 
-const int MAX_PLAYS = 9;
 int positions_taken[3][3] = {0};
 
 GameProgressEnum tic_tac_toe()
@@ -85,7 +81,7 @@ GameProgressEnum tic_tac_toe()
         {
           set_position(position, player + 1);
           plays++;
-          if (check_winner() || plays == MAX_PLAYS)
+          if (check_winner() || plays == MAX_PLAYS_TIC)
           {
             game_state = GAME_OVER;
             set_matrix_arr(matrix_arr, position, player == P1 ? RED : GREEN);

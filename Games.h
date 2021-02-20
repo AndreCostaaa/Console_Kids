@@ -26,7 +26,12 @@ typedef enum GameModeEnum
 #define GOOD_REACTION_TIME 250
 #define BAD_REACTION_TIME 750
 #define TIME_TO_PLAY_SEQUENCE 5000
-#define PLAYS_MAX 64
+#define PLAYS_MAX_SEQUENCE 64
+#define PLAYS_MAX_4_IN_A_ROW 64
+#define MAX_PLAYS_TIC 9
+
+#define P1 (uint8_t) 0
+#define P2 (uint8_t) 1
 
 GameProgressEnum reaction();
 GameProgressEnum four_in_a_row();
