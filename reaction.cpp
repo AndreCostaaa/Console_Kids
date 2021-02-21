@@ -36,7 +36,7 @@ GameProgressEnum reaction()
       {
         game_state = START;
         Serial.println("Start");
-        start_timer.start(random(100, 500));
+        start_timer.start(random(500, 5000));
         led_green.setOff();
         led_yellow.setOff();
       }

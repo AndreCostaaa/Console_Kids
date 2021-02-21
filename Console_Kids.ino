@@ -4,6 +4,7 @@
 
 void setup()
 {
+  //initializes pins, serial communication and matrix
   init_();
 }
 
@@ -52,8 +53,6 @@ void loop()
     }
     break;
   case PLAYING:
-    Serial.print("gaming: ");
-    Serial.println(game_index);
     if ((*game_func_arr[game_index])() == QUIT)
     {
       state = SELECTING;
