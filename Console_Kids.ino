@@ -1,6 +1,7 @@
 #include "Console_Kids.h"
 #include "Timer.h"
 #include "Games.h"
+#include "serial.h"
 
 void setup()
 {
@@ -15,7 +16,7 @@ void loop()
   static ConsoleStateEnum state = SELECTING;
   static uint8_t game_index = 0;
   ButtonPressedEnum btn = NONE;
-
+  pc.receive_data();
   btn = getButtonPressed();
   switch (state)
   {

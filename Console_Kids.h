@@ -1,5 +1,6 @@
 
 #include "Led.h"
+#include "serial.h"
 #include <Arduino.h>
 
 
@@ -119,4 +120,5 @@ extern Led led_green;
 extern Led led_yellow;
 extern Led led_blue;
 extern Led* led_arr[NB_LEDS];
+extern PC_APP pc;
 #endif

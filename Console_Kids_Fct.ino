@@ -1,10 +1,11 @@
 #include "Console_Kids.h"
 #include "FctAntirebond.h"
-
+#include "serial.h"
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
 
+PC_APP pc = PC_APP(Serial);
 Adafruit_BicolorMatrix matrix = Adafruit_BicolorMatrix();
 
 Led led_red = Led(LED_RED_PIN);
@@ -35,7 +36,7 @@ void init_()
   }
   randomSeed(analogRead(A0));
 
-  Serial.begin(115200);
+  pc.begin();
   matrix.begin(0x70);
 }
 
@@ -47,6 +48,9 @@ ButtonPressedEnum getButtonPressed()
   static byte btn_d;
   static Timer anti_rebond = Timer();
   anti_rebond.set_auto_restart(true);
+  byte *btn_state[] = {&btn_a, &btn_b, &btn_c, &btn_d};
+  bool data[4];
+  ColorEnum btn_color[] = {CMD_RED, CMD_GREEN, CMD_ORANGE, CMD_BLUE};
   if (!anti_rebond.get_started())
   {
     anti_rebond.start(10);
@@ -58,32 +62,55 @@ ButtonPressedEnum getButtonPressed()
     Antirebond(BTN_B_PIN, &btn_b, ACTIF_A_0);
     Antirebond(BTN_C_PIN, &btn_c, ACTIF_A_0);
     Antirebond(BTN_D_PIN, &btn_d, ACTIF_A_0);
-
-    if (btn_a == FLANC_ACTIF)
+  }
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    if (*(btn_state[i]) == INACTIF)
     {
-      return BTN_A;
+      data[i] = false;
     }
-    else if (btn_b == FLANC_ACTIF)
+    else
     {
-      return BTN_B;
-    }
-    else if (btn_c == FLANC_ACTIF)
-    {
-      return BTN_C;
-    }
-    else if (btn_d == FLANC_ACTIF)
-    {
-      return BTN_D;
+      data[i] = true;
     }
   }
+
+  if (pc.get_connected())
+  {
+    pc.set_buttons(data);
+  }
+  if (btn_a == FLANC_ACTIF)
+  {
+    return BTN_A;
+  }
+  else if (btn_b == FLANC_ACTIF)
+  {
+    return BTN_B;
+  }
+  else if (btn_c == FLANC_ACTIF)
+  {
+    return BTN_C;
+  }
+  else if (btn_d == FLANC_ACTIF)
+  {
+    return BTN_D;
+  }
+
   return NONE;
 }
 
 void update_leds()
 {
+  bool led_state[4];
+
   for (int i = 0; i < NB_LEDS; i++)
   {
     led_arr[i]->update();
+    led_state[i] = led_arr[i]->get();
+  }
+  if (pc.get_connected())
+  {
+    pc.set_leds(led_state);
   }
 }
 void set_matrix(uint8_t data[8][8])
@@ -96,6 +123,10 @@ void set_matrix(uint8_t data[8][8])
     {
       matrix.drawPixel(i, j, data[i][j]);
     }
+  }
+  if (pc.get_connected())
+  {
+    pc.set_matrix(data);
   }
   matrix.writeDisplay();
 }

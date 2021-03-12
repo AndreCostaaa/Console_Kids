@@ -22,6 +22,5 @@ class Led
     void update();
     bool get();
     
-    
 };
 #endif

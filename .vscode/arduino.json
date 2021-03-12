@@ -1,8 +1,8 @@
 {
     "programmer": "AVR ISP",
-    "board": "arduino:avr:nano",
-    "configuration": "cpu=atmega328old",
+    "board": "arduino:avr:mega",
+    "configuration": "cpu=atmega2560",
     "port": "COM3",
     "sketch": "Console_Kids.ino",
-    "output": "D:/Documentos/VsCodeArduinoBuilds"
+    "output": "E:/Documentos/VsCodeArduinoBuilds"
 }
