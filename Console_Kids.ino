@@ -41,10 +41,6 @@ void loop()
       led_arr[game_index]->setOn();
     }
 
-    else if (btn == BTN_D) //next game
-    {
-    }
-
     for (int i = 0; i < 8; i++)
     {
       for (int j = 0; j < 8; j++)
@@ -58,6 +54,7 @@ void loop()
     {
       state = SELECTING;
     }
+    set_all_leds_off();
     break;
   default:
     break;

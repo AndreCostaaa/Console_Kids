@@ -2,7 +2,7 @@
 
 PC_APP::PC_APP(HardwareSerial &serial) : _serial(serial)
 {
-    _is_connected = true;
+    _is_connected = false;
 }
 void PC_APP::begin()
 {

@@ -62,43 +62,49 @@ ButtonPressedEnum getButtonPressed()
     Antirebond(BTN_B_PIN, &btn_b, ACTIF_A_0);
     Antirebond(BTN_C_PIN, &btn_c, ACTIF_A_0);
     Antirebond(BTN_D_PIN, &btn_d, ACTIF_A_0);
-  }
-  for (int i = 0; i < NB_LEDS; i++)
-  {
-    if (*(btn_state[i]) == INACTIF)
-    {
-      data[i] = false;
-    }
-    else
-    {
-      data[i] = true;
-    }
-  }
 
-  if (pc.get_connected())
-  {
-    pc.set_buttons(data);
-  }
-  if (btn_a == FLANC_ACTIF)
-  {
-    return BTN_A;
-  }
-  else if (btn_b == FLANC_ACTIF)
-  {
-    return BTN_B;
-  }
-  else if (btn_c == FLANC_ACTIF)
-  {
-    return BTN_C;
-  }
-  else if (btn_d == FLANC_ACTIF)
-  {
-    return BTN_D;
-  }
+    for (int i = 0; i < NB_LEDS; i++)
+    {
+      if (*(btn_state[i]) == INACTIF)
+      {
+        data[i] = false;
+      }
+      else
+      {
+        data[i] = true;
+      }
+    }
 
+    if (pc.get_connected())
+    {
+      pc.set_buttons(data);
+    }
+    if (btn_a == FLANC_ACTIF)
+    {
+      return BTN_A;
+    }
+    else if (btn_b == FLANC_ACTIF)
+    {
+      return BTN_B;
+    }
+    else if (btn_c == FLANC_ACTIF)
+    {
+      return BTN_C;
+    }
+    else if (btn_d == FLANC_ACTIF)
+    {
+      return BTN_D;
+    }
+  }
   return NONE;
 }
-
+void set_all_leds_off()
+{
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    led_arr[i]->setOff();
+  }
+}
 void update_leds()
 {
   bool led_state[4];
@@ -130,6 +136,7 @@ void set_matrix(uint8_t data[8][8])
   }
   matrix.writeDisplay();
 }
+
 void set_crown(uint8_t data[8][8])
 {
   const uint8_t crown[8][8] =
