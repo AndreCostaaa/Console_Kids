@@ -34,7 +34,7 @@ void init_()
   {
     led_arr[i]->setOn(500);
   }
-  randomSeed(analogRead(A0));
+  randomSeed(analogRead(6));
 
   pc.begin();
   matrix.begin(0x70);
