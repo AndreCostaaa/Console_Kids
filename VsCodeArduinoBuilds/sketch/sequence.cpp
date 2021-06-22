@@ -8,7 +8,7 @@ GameProgressEnum sequence()
   uint16_t LED_ON_TIME[] = {500, 350, 250, 150};
   uint16_t LED_OFF_TIME[] = {200, 150 ,100 ,50};
   uint16_t TIME_TO_PLAY[] = {5000, 3500, 2500, 1000};
-  int8_t sequence_arr[PLAYS_MAX_SEQUENCE];
+  int8_t sequence_arr[PLAYS_MAX_SEQUENCE] = {-1};
   GameStateEnum old_game_state = SET_GAME_MODE;
   GameStateEnum game_state = START;
   int index = 0;
@@ -30,6 +30,9 @@ GameProgressEnum sequence()
     switch (game_state)
     {
     case START:
+
+      //Initialize array
+
       memset(sequence_arr, -1, sizeof(sequence_arr[0]) * PLAYS_MAX_SEQUENCE);
       for(int i = 0; i < NB_LEDS; i++)
       {
@@ -42,23 +45,27 @@ GameProgressEnum sequence()
           led_arr[i]->setOff();
         }
       }
-      if (btn == BTN_A || btn == BTN_C)
+      if (btn == BTN_A )
       {
         index = 0;
         plays = 0;
         sequence_arr[plays] = (int)random(0, 4);
         set_all_leds_off();
+        timer_led.start(250);
         game_state = DISPLAY_SEQUENCE;
       }
-      if(btn == BTN_B)
+      else if(btn == BTN_B)
       {
         up_difficulty(&difficulty);
       }
-      if (btn == BTN_D)
+      else if (btn == BTN_C)
       {
         lower_difficulty(&difficulty);
       }
-
+      else if(btn == BTN_D)
+      {
+        return QUIT;
+      }
       break;
 
     case DISPLAY_SEQUENCE:
@@ -67,7 +74,6 @@ GameProgressEnum sequence()
         index = 0;
         game_state = WAIT;
         time_to_play.start(TIME_TO_PLAY[difficulty]);
-        Serial.println("waiting");
       }
       else
       {
@@ -237,7 +243,7 @@ GameProgressEnum sequence()
       }
       else if (btn != NONE)
       {
-        game_state = START;
+        return RESTART;
       }
       break;
     case GAME_OVER_CROWN:

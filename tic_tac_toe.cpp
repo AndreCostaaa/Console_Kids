@@ -8,16 +8,16 @@ static uint8_t check_winner();
 static void get_winning_positions(int8_t *positions, uint8_t winner);
 static int get_position(uint8_t x, uint8_t y);
 static void init_board(uint8_t arr[8][8]);
-int positions_taken[3][3] = {0};
+int8_t positions_taken[3][3] = {{0,0}};
 
 GameProgressEnum tic_tac_toe()
 {
   GameStateEnum game_state = START;
   bool blinking = true;
   uint8_t position = 0;
-  int plays = 0;
-  uint8_t matrix_arr[MATRIX_ROWS][MATRIX_ROWS] = {0};
-  int player = 0;
+  uint8_t plays = 0;
+  uint8_t matrix_arr[MATRIX_ROWS][MATRIX_ROWS] = {{0,0}};
+  uint8_t player = P1;
   int8_t winning_positions[3] = {-1};
   ButtonPressedEnum btn;
   Timer blink_timer = Timer();
@@ -32,12 +32,13 @@ GameProgressEnum tic_tac_toe()
     switch (game_state)
     {
     case START:
-      //Empty positions taken
+      //empty positions taken
       memset(positions_taken, 0, (sizeof(positions_taken[0][0])) * 3 * 3);
       memset(winning_positions, -1, sizeof(winning_positions[0]) * 3);
       //Init board
       init_board(matrix_arr);
-      game_state = GAMING;
+      game_state = GAMING; 
+      turn_on_player_leds(player);
       break;
 
     case GAMING:
@@ -66,6 +67,7 @@ GameProgressEnum tic_tac_toe()
 
       if ((btn == BTN_A && player == P1) || (btn == BTN_C && player == P2))
       {
+        set_all_leds_off();
         set_position(position, player + 1);
         plays++;
         winner = check_winner();
@@ -79,9 +81,14 @@ GameProgressEnum tic_tac_toe()
           set_matrix_arr(matrix_arr, position, player == P1 ? RED : GREEN);
           next_position(&position);
           player = player == P1 ? P2 : P1;
+          turn_on_player_leds(player);
         }
       }
-
+      //quitting the game
+      if ((btn == BTN_B && player == P2) || (btn == BTN_D && player == P1))
+      {
+        return QUIT;
+      }
       break;
 
     case GAME_OVER:

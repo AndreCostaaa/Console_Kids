@@ -1,29 +1,31 @@
 #include <Arduino.h>
-#line 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
+#line 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
 #include "Console_Kids.h"
 #include "Timer.h"
 #include "Games.h"
 #include "serial.h"
 
-#line 6 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
+#line 6 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
 void setup();
-#line 13 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
+#line 13 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
 void loop();
-#line 17 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 17 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void init_();
-#line 43 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 43 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 ButtonPressedEnum getButtonPressed();
-#line 101 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 108 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_all_leds_off();
-#line 108 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 115 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void update_leds();
-#line 122 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 139 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_matrix(uint8_t data[8][8]);
-#line 140 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 163 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_crown(uint8_t data[8][8]);
-#line 4 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\FctAntirebond.ino"
+#line 184 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+void turn_on_player_leds(uint8_t player);
+#line 4 "u:\\P. Console Kids\\Prog\\Console_Kids\\FctAntirebond.ino"
 void Antirebond(int iEntree,byte *bRead, bool boActif);
-#line 6 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
+#line 6 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
 void setup()
 {
   //initializes pins, serial communication and matrix
@@ -89,7 +91,7 @@ void loop()
   set_matrix(matrix_arr);
 }
 
-#line 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
+#line 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 #include "Console_Kids.h"
 #include "FctAntirebond.h"
 #include "serial.h"
@@ -141,35 +143,41 @@ ButtonPressedEnum getButtonPressed()
   static Timer anti_rebond = Timer();
   anti_rebond.set_auto_restart(true);
   byte *btn_state[] = {&btn_a, &btn_b, &btn_c, &btn_d};
-  bool data[4];
+  static int8_t old_btn_data = 0;
+  int8_t btn_data = 0;
   ColorEnum btn_color[] = {CMD_RED, CMD_GREEN, CMD_ORANGE, CMD_BLUE};
   if (!anti_rebond.get_started())
   {
     anti_rebond.start(10);
   }
-
   if (anti_rebond.isDone())
   {
     Antirebond(BTN_A_PIN, &btn_a, ACTIF_A_0);
     Antirebond(BTN_B_PIN, &btn_b, ACTIF_A_0);
     Antirebond(BTN_C_PIN, &btn_c, ACTIF_A_0);
     Antirebond(BTN_D_PIN, &btn_d, ACTIF_A_0);
-
     for (int i = 0; i < NB_LEDS; i++)
     {
-      if (*(btn_state[i]) == INACTIF)
+      if (*(btn_state[i]) != INACTIF)
       {
-        data[i] = false;
+        btn_data |= (1 << i);
       }
       else
       {
-        data[i] = true;
+        btn_data &= ~(1 << i);
       }
     }
-
     if (pc.get_connected())
     {
-      pc.set_buttons(data);
+      if (btn_data != old_btn_data)
+      {
+        pc.set_buttons(btn_data);
+      }
+      old_btn_data = btn_data;
+    }
+    else
+    {
+      old_btn_data = -1;
     }
     if (btn_a == FLANC_ACTIF)
     {
@@ -190,6 +198,7 @@ ButtonPressedEnum getButtonPressed()
   }
   return NONE;
 }
+
 void set_all_leds_off()
 {
   for (int i = 0; i < NB_LEDS; i++)
@@ -199,36 +208,52 @@ void set_all_leds_off()
 }
 void update_leds()
 {
-  bool led_state[4];
-
+  int8_t led_data = 0;
+  static int8_t old_led_data = 0;
   for (int i = 0; i < NB_LEDS; i++)
   {
     led_arr[i]->update();
-    led_state[i] = led_arr[i]->get();
+    led_data |= led_arr[i]->get() << i;
   }
   if (pc.get_connected())
   {
-    pc.set_leds(led_state);
+    if (led_data != old_led_data)
+    {
+      pc.set_leds(led_data);
+    }
+    old_led_data = led_data;
+  }
+  else
+  {
+    old_led_data = -1;
   }
 }
+
+uint8_t old_matrix_data[8][8];
 void set_matrix(uint8_t data[8][8])
 {
+
   matrix.clear();
   matrix.setRotation(0);
+  bool send_data_to_pc = false;
   for (int i = 0; i < 8; i++)
   {
     for (int j = 0; j < 8; j++)
     {
       matrix.drawPixel(i, j, data[i][j]);
+      if (data[i][j] != old_matrix_data[i][j])
+      {
+        send_data_to_pc = true;
+        old_matrix_data[i][j] = data[i][j];
+      }
     }
   }
-  if (pc.get_connected())
+  if (pc.get_connected() && send_data_to_pc)
   {
     pc.set_matrix(data);
   }
   matrix.writeDisplay();
 }
-
 void set_crown(uint8_t data[8][8])
 {
   const uint8_t crown[8][8] =
@@ -249,7 +274,18 @@ void set_crown(uint8_t data[8][8])
     }
   }
 }
-#line 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\FctAntirebond.ino"
+
+void turn_on_player_leds(uint8_t player)
+{
+  //player evaluates to either 0 or 1. so i*2 will evaluate to either 0 or 2
+  //player 1's leds are the positions 0 and 1 at the led_arr
+  //player 2's leds are the positions 2 and 3 at the led_arr
+  for (int8_t i = 2 * player, j = 0; j < NB_LEDS / 2; i++, j++)
+  {
+    led_arr[i]->setOn();
+  }
+}
+#line 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\FctAntirebond.ino"
 #include "FctAntirebond.h"
 
 // Fonction Antirebond ******************************************************************

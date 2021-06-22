@@ -2,7 +2,7 @@
     "programmer": "AVR ISP",
     "board": "arduino:megaavr:nona4809",
     "configuration": "mode=off",
-    "port": "COM6",
+    "port": "COM2",
     "sketch": "Console_Kids.ino",
     "output": "./VsCodeArduinoBuilds"
 }

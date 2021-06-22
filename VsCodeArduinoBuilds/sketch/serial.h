@@ -9,7 +9,11 @@ typedef enum
     CMD_GREEN = 'G',
     CMD_ORANGE = 'O',
     CMD_BLUE = 'B',
-    CMD_OFF = 'V'
+    CMD_OFF = 'V',
+    MATRIX_CLEAR = 0x0,
+    MATRIX_RED = 0x01,
+    MATRIX_YELLOW = 0x02,
+    MATRIX_GREEN = 0x03
 } ColorEnum;
 
 class PC_APP
@@ -32,7 +36,7 @@ private:
         MIC = 'C',
         BTN = 'B'
     } ComponentEnum;
-
+    
     HardwareSerial &_serial;
     bool _is_connected;
     char data_in[50];
@@ -52,8 +56,8 @@ public:
     void set_btn_idle(ColorEnum btn);
     void set_mic_clapped();
     void set_mic_idle();
-    void set_leds(bool *data);
-    void set_buttons(bool *data);
+    void set_leds(uint8_t data);
+    void set_buttons(uint8_t data);
     //Get
     //Extra feautures todo
 

@@ -1,5 +1,5 @@
 #include "serial.h"
-
+#include "Console_Kids.h"
 PC_APP::PC_APP(HardwareSerial &serial) : _serial(serial)
 {
     _is_connected = true;
@@ -32,125 +32,83 @@ void PC_APP::receive_data()
 
 void PC_APP::set_matrix_position(int x, int y, ColorEnum color)
 {
-    _serial.write(SET);
-    _serial.write(MATRIX);
-    _serial.write(x + '0');
-    _serial.write(y + '0');
-    _serial.write(color);
-    _serial.println();
+  //not used. all leds are set at the same time
 }
 void PC_APP::set_led_on(ColorEnum led)
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(LED);
     _serial.write(led);
     _serial.write(ON);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_led_off(ColorEnum led)
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(LED);
     _serial.write(led);
     _serial.write(OFF);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_btn_pressed(ColorEnum btn)
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(BTN);
     _serial.write(btn);
     _serial.write(ON);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_btn_idle(ColorEnum btn)
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(BTN);
     _serial.write(btn);
     _serial.write(OFF);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_mic_clapped()
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(MIC);
     _serial.write(ON);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_mic_idle()
 {
-    _serial.write(SET);
+    /*_serial.write(SET);
     _serial.write(MIC);
     _serial.write(OFF);
-    _serial.println();
+    _serial.println();*/
 }
 void PC_APP::set_matrix(uint8_t data[8][8])
 {
-    ColorEnum color;
-    char buffer[8];
-    int index = 0;
-    bool skip = false;
-    for (int i = 0; i < 8; i++)
-    {
-        if (!skip)
-        {
-            _serial.write(SET);
-            _serial.write(MATRIX);
-            _serial.write(EVERYTHING);
-            _serial.write(i + '0');
-            skip = true;
-        }
-        else
-        {
-            skip = false;
-        }
-        for (int j = 0; j < 8; j++)
-        {
-            switch (data[i][j])
-            {
-            case 1:
-                color = CMD_RED;
-                break;
-            case 3:
-                color = CMD_GREEN;
-                break;
-            case 2:
-                color = CMD_ORANGE;
-                break;
-            case 0:
-                color = CMD_OFF;
-                break;
-            default:
-                break;
-            }
-            _serial.write(color);
-        }
-        if(!skip)
-        {
-            _serial.println();
-        }
-    }
+
+  uint16_t data_to_send = 0;      
+  _serial.write(SET);
+  _serial.write(MATRIX);
+  for(int8_t y = 0; y < MATRIX_ROWS; y++)
+  {
+      for(int8_t x = 0; x < MATRIX_ROWS; x++)
+      {
+          data_to_send |= data[y][x] << x* 2;
+      }
+    _serial.write(data_to_send >> 8);
+    _serial.write(data_to_send & 0xFF);
+    data_to_send = 0;
+  }
+  _serial.println();
 }
-void PC_APP::set_leds(bool *data)
+void PC_APP::set_leds(uint8_t data)
 {
-    _serial.write(SET);
-    _serial.write(LED);
-    _serial.write(EVERYTHING);
-    for (int i = 0; i < 4; i++)
-    {
-        _serial.write(data[i] == true ? ON : OFF);
-    }
-    _serial.println();
+  _serial.write(SET);
+  _serial.write(LED);
+  _serial.write(data);
+  _serial.println();
 }
-void PC_APP::set_buttons(bool *data)
+void PC_APP::set_buttons(uint8_t data)
 {
-    _serial.write(SET);
-    _serial.write(BTN);
-    _serial.write(EVERYTHING);
-    for (int i = 0; i < 4; i++)
-    {
-        _serial.write(data[i] == true ? ON : OFF);
-    }
-    _serial.println();
+  _serial.write(SET);
+  _serial.write(BTN);
+  _serial.write(data);
+  _serial.println();
 }

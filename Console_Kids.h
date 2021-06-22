@@ -115,7 +115,7 @@ void update_leds();
 void set_matrix(uint8_t data[8][8]);
 void set_crown(uint8_t data[8][8]);
 void set_all_leds_off();
-
+void turn_on_player_leds(uint8_t player);
 extern Led led_red;
 extern Led led_green;
 extern Led led_yellow;

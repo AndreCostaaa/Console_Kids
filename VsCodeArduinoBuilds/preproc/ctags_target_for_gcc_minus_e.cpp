@@ -1,8 +1,8 @@
-# 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
-# 2 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino" 2
+# 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
+# 2 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino" 2
 
-# 4 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino" 2
-# 5 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino" 2
+# 4 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino" 2
+# 5 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino" 2
 
 void setup()
 {
@@ -68,17 +68,17 @@ void loop()
      Complements the use of setOn(duration)
 
   */
-# 67 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids.ino"
+# 67 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
   update_leds();
   set_matrix(matrix_arr);
 }
-# 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino"
-# 2 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
-# 3 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
-# 4 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
-# 5 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
-# 6 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
-# 7 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+# 2 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 3 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 4 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 5 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 6 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
+# 7 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino" 2
 
 PC_APP pc = PC_APP(Serial);
 Adafruit_BicolorMatrix matrix = Adafruit_BicolorMatrix();
@@ -124,35 +124,41 @@ ButtonPressedEnum getButtonPressed()
   static Timer anti_rebond = Timer();
   anti_rebond.set_auto_restart(true);
   byte *btn_state[] = {&btn_a, &btn_b, &btn_c, &btn_d};
-  bool data[4];
+  static int8_t old_btn_data = 0;
+  int8_t btn_data = 0;
   ColorEnum btn_color[] = {CMD_RED, CMD_GREEN, CMD_ORANGE, CMD_BLUE};
   if (!anti_rebond.get_started())
   {
     anti_rebond.start(10);
   }
-
   if (anti_rebond.isDone())
   {
     Antirebond(13, &btn_a, (bool)0 /* Si l'entrée est active à 0                            */);
     Antirebond(A1, &btn_b, (bool)0 /* Si l'entrée est active à 0                            */);
     Antirebond(4, &btn_c, (bool)0 /* Si l'entrée est active à 0                            */);
     Antirebond(5, &btn_d, (bool)0 /* Si l'entrée est active à 0                            */);
-
     for (int i = 0; i < 4; i++)
     {
-      if (*(btn_state[i]) == 0 /* 0: L'entree est non actionnee*/)
+      if (*(btn_state[i]) != 0 /* 0: L'entree est non actionnee*/)
       {
-        data[i] = false;
+        btn_data |= (1 << i);
       }
       else
       {
-        data[i] = true;
+        btn_data &= ~(1 << i);
       }
     }
-
     if (pc.get_connected())
     {
-      pc.set_buttons(data);
+      if (btn_data != old_btn_data)
+      {
+        pc.set_buttons(btn_data);
+      }
+      old_btn_data = btn_data;
+    }
+    else
+    {
+      old_btn_data = -1;
     }
     if (btn_a == 3 /* 3: L'entree passe a l'etat actif*/)
     {
@@ -173,6 +179,7 @@ ButtonPressedEnum getButtonPressed()
   }
   return NONE;
 }
+
 void set_all_leds_off()
 {
   for (int i = 0; i < 4; i++)
@@ -182,36 +189,52 @@ void set_all_leds_off()
 }
 void update_leds()
 {
-  bool led_state[4];
-
+  int8_t led_data = 0;
+  static int8_t old_led_data = 0;
   for (int i = 0; i < 4; i++)
   {
     led_arr[i]->update();
-    led_state[i] = led_arr[i]->get();
+    led_data |= led_arr[i]->get() << i;
   }
   if (pc.get_connected())
   {
-    pc.set_leds(led_state);
+    if (led_data != old_led_data)
+    {
+      pc.set_leds(led_data);
+    }
+    old_led_data = led_data;
+  }
+  else
+  {
+    old_led_data = -1;
   }
 }
+
+uint8_t old_matrix_data[8][8];
 void set_matrix(uint8_t data[8][8])
 {
+
   matrix.clear();
   matrix.setRotation(0);
+  bool send_data_to_pc = false;
   for (int i = 0; i < 8; i++)
   {
     for (int j = 0; j < 8; j++)
     {
       matrix.drawPixel(i, j, data[i][j]);
+      if (data[i][j] != old_matrix_data[i][j])
+      {
+        send_data_to_pc = true;
+        old_matrix_data[i][j] = data[i][j];
+      }
     }
   }
-  if (pc.get_connected())
+  if (pc.get_connected() && send_data_to_pc)
   {
     pc.set_matrix(data);
   }
   matrix.writeDisplay();
 }
-
 void set_crown(uint8_t data[8][8])
 {
   const uint8_t crown[8][8] =
@@ -232,7 +255,18 @@ void set_crown(uint8_t data[8][8])
     }
   }
 }
-# 1 "c:\\Users\\André\\Desktop\\Console_Kids\\Console_Kids\\FctAntirebond.ino"
+
+void turn_on_player_leds(uint8_t player)
+{
+  //player evaluates to either 0 or 1. so i*2 will evaluate to either 0 or 2
+  //player 1's leds are the positions 0 and 1 at the led_arr
+  //player 2's leds are the positions 2 and 3 at the led_arr
+  for (int8_t i = 2 * player, j = 0; j < 4 / 2; i++, j++)
+  {
+    led_arr[i]->setOn();
+  }
+}
+# 1 "u:\\P. Console Kids\\Prog\\Console_Kids\\FctAntirebond.ino"
 
 
 // Fonction Antirebond ******************************************************************

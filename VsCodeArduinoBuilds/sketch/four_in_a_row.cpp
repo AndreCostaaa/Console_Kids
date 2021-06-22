@@ -28,6 +28,8 @@ GameProgressEnum four_in_a_row()
   blink.start(500);
   blink.set_auto_restart(true);
   set_matrix_pos(matrix_arr, position, RED);
+  turn_on_player_leds(player);
+
 
   while (1)
   {
@@ -35,6 +37,23 @@ GameProgressEnum four_in_a_row()
     switch (game_state)
     {
     case GAMING:
+
+
+      //if the timer is done
+      if (blink.isDone())
+      {
+        //turn on/off the pixel
+        if (led_on)
+        {
+          set_matrix_pos(matrix_arr, position, OFF);
+        }
+        else
+        {
+          set_matrix_pos(matrix_arr, position, player == P1 ? RED : GREEN);
+        }
+        led_on = !led_on;
+      }
+
       if ((btn == BTN_B && player == P1) || (btn == BTN_D && player == P2))
       {
         /*if we change positions, turn off the current position.
@@ -81,21 +100,15 @@ GameProgressEnum four_in_a_row()
           }
           //change player
           player = player == P1 ? P2 : P1;
+          set_all_leds_off();
+          turn_on_player_leds(player);
         }
       }
-      //if the timer is done
-      if (blink.isDone())
+
+      //quitting the game
+      if ((btn == BTN_B && player == P2) || (btn == BTN_D && player == P1))
       {
-        //turn on/off the pixel
-        if (led_on)
-        {
-          set_matrix_pos(matrix_arr, position, OFF);
-        }
-        else
-        {
-          set_matrix_pos(matrix_arr, position, player == P1 ? RED : GREEN);
-        }
-        led_on = !led_on;
+        return QUIT;
       }
       break;
     case GAME_OVER:
@@ -126,6 +139,24 @@ GameProgressEnum four_in_a_row()
           }
         }
         led_on = !led_on;
+
+            switch (winner)
+      {
+      case -1:
+        led_red.setOn();
+        led_yellow.setOn();
+        led_green.setOn();
+        led_blue.setOn();
+        break;
+      case P1:
+        led_red.setOn();
+        led_green.setOn();
+        break;
+      case P2:
+        led_yellow.setOn();
+        led_blue.setOn();
+        break;
+      }
       }
       if (btn == BTN_D)
       {

@@ -173,11 +173,7 @@ GameProgressEnum reaction()
       }
       else if (btn != NONE)
       {
-        reaction_time_p1 = 0;
-        reaction_time_p2 = 0;
-        winner = 0;
-        memset(matrix_arr, OFF, sizeof(matrix_arr[0][0]) * MATRIX_ROWS * MATRIX_ROWS);
-        game_state = SET_GAME_MODE;
+        return RESTART;
       }
       break;
     default: // Should never happen;
