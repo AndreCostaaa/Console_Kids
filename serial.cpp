@@ -96,19 +96,19 @@ void PC_APP::set_matrix(uint8_t data[8][8])
     _serial.write(data_to_send & 0xFF);
     data_to_send = 0;
   }
-  _serial.println();
+ _serial.print('\n');
 }
 void PC_APP::set_leds(uint8_t data)
 {
   _serial.write(SET);
   _serial.write(LED);
   _serial.write(data);
-  _serial.println();
+  _serial.print('\n');
 }
 void PC_APP::set_buttons(uint8_t data)
 {
   _serial.write(SET);
   _serial.write(BTN);
   _serial.write(data);
-  _serial.println();
+  _serial.print('\n');
 }
