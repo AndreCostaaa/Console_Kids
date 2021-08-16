@@ -1,12 +1,14 @@
+
 #include "Games.h"
 #include "Console_Kids.h"
 static void set_matrix_array(uint8_t matrix_arr[8][8], int pos);
-static void lower_difficulty(uint8_t* dif);
-static void up_difficulty(uint8_t* dif);
+static void lower_difficulty(uint8_t *dif);
+static void up_difficulty(uint8_t *dif);
+
 GameProgressEnum sequence()
 {
   uint16_t LED_ON_TIME[] = {500, 350, 250, 150};
-  uint16_t LED_OFF_TIME[] = {200, 150 ,100 ,50};
+  uint16_t LED_OFF_TIME[] = {200, 150, 100, 50};
   uint16_t TIME_TO_PLAY[] = {5000, 3500, 2500, 1000};
   int8_t sequence_arr[PLAYS_MAX_SEQUENCE] = {-1};
   GameStateEnum old_game_state = SET_GAME_MODE;
@@ -19,7 +21,7 @@ GameProgressEnum sequence()
   ButtonPressedEnum btn;
   uint8_t matrix_arr[8][8] = {0};
   bool new_state;
-
+  bool game_over;
   uint8_t difficulty = 0;
   while (1)
   {
@@ -32,11 +34,11 @@ GameProgressEnum sequence()
     case START:
 
       //Initialize array
-
+      game_over = false;
       memset(sequence_arr, -1, sizeof(sequence_arr[0]) * PLAYS_MAX_SEQUENCE);
-      for(int i = 0; i < NB_LEDS; i++)
+      for (int i = 0; i < NB_LEDS; i++)
       {
-        if(i <= difficulty)
+        if (i <= difficulty)
         {
           led_arr[i]->setOn();
         }
@@ -45,7 +47,7 @@ GameProgressEnum sequence()
           led_arr[i]->setOff();
         }
       }
-      if (btn == BTN_A )
+      if (btn == BTN_A)
       {
         index = 0;
         plays = 0;
@@ -54,7 +56,7 @@ GameProgressEnum sequence()
         timer_led.start(250);
         game_state = DISPLAY_SEQUENCE;
       }
-      else if(btn == BTN_B)
+      else if (btn == BTN_B)
       {
         up_difficulty(&difficulty);
       }
@@ -62,7 +64,7 @@ GameProgressEnum sequence()
       {
         lower_difficulty(&difficulty);
       }
-      else if(btn == BTN_D)
+      else if (btn == BTN_D)
       {
         return QUIT;
       }
@@ -109,12 +111,12 @@ GameProgressEnum sequence()
           if (led_state == 0)
           {
             led_state = 1;
-            timer_led.start(200);
+            timer_led.start(500);
           }
           else if (timer_led.isDone())
           {
+            set_all_leds_off();
             led_state = 0;
-            led_green.setOff();
             index = 0;
             plays++;
             set_matrix_array(matrix_arr, plays - 1);
@@ -130,67 +132,29 @@ GameProgressEnum sequence()
       //Hitting sequence
       else
       {
-        if(time_to_play.isDone())
+        if (time_to_play.isDone())
         {
           led_red.setOn(250);
           game_state = GAME_OVER;
         }
-        if(btn != NONE)
+        if (btn != NONE)
         {
           time_to_play.restart();
+          if (sequence_arr[index] == (int8_t)btn)
+          {
+            //led_green.setOn(200);
+            index++;
+          }
+          else
+          {
+            set_all_leds_on(500);
+            game_over = true;
+          }
         }
-        switch (btn)
+        if (game_over && !led_red.get())
         {
-        case BTN_A:
-          if (sequence_arr[index] == 0)
-          {
-            led_green.setOn(200);
-            index++;
-          }
-          else
-          {
-            led_red.setOn(1000);
-            game_state = GAME_OVER;
-          }
-          break;
-        case BTN_B:
-          if (sequence_arr[index] == 1)
-          {
-            led_green.setOn(200);
-            index++;
-          }
-          else
-          {
-            led_red.setOn(1000);
-            game_state = GAME_OVER;
-          }
-          break;
-        case BTN_C:
-          if (sequence_arr[index] == 2)
-          {
-            led_green.setOn(200);
-            index++;
-          }
-          else
-          {
-            led_red.setOn(1000);
-            game_state = GAME_OVER;
-          }
-          break;
-        case BTN_D:
-          if (sequence_arr[index] == 3)
-          {
-            led_green.setOn(200);
-            index++;
-          }
-          else
-          {
-            led_red.setOn(1000);
-            game_state = GAME_OVER;
-          }
-          break;
-        default:
-          break;
+          game_state = GAME_OVER;
+          delay(200);
         }
       }
 
@@ -226,9 +190,9 @@ GameProgressEnum sequence()
                   }
                 }
               }
-              else if(index < 64)
+              else if (index < 64)
               {
-                memset(matrix_arr, 0, sizeof(matrix_arr[0][0])* 8 *8 );
+                memset(matrix_arr, 0, sizeof(matrix_arr[0][0]) * 8 * 8);
               }
               index = 0;
             }
@@ -276,9 +240,9 @@ static void set_matrix_array(uint8_t matrix_arr[8][8], int pos)
   }
 }
 
-static void lower_difficulty(uint8_t* dif)
+static void lower_difficulty(uint8_t *dif)
 {
-  if(*dif > MIN_DIFFICULTY)
+  if (*dif > MIN_DIFFICULTY)
   {
     (*dif)--;
     return;
@@ -286,9 +250,9 @@ static void lower_difficulty(uint8_t* dif)
   *dif = MAX_DIFFICULTY;
 }
 
-static void up_difficulty(uint8_t* dif)
+static void up_difficulty(uint8_t *dif)
 {
-  if(*dif < MAX_DIFFICULTY)
+  if (*dif < MAX_DIFFICULTY)
   {
     (*dif)++;
     return;

@@ -15,13 +15,17 @@ void init_();
 ButtonPressedEnum getButtonPressed();
 #line 108 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_all_leds_off();
-#line 115 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+#line 116 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+void set_all_leds_on();
+#line 124 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+void set_all_leds_on(int duration);
+#line 131 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void update_leds();
-#line 139 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+#line 155 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_matrix(uint8_t data[8][8]);
-#line 163 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+#line 179 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void set_crown(uint8_t data[8][8]);
-#line 184 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
+#line 200 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids_Fct.ino"
 void turn_on_player_leds(uint8_t player);
 #line 4 "u:\\P. Console Kids\\Prog\\Console_Kids\\FctAntirebond.ino"
 void Antirebond(int iEntree,byte *bRead, bool boActif);
@@ -128,7 +132,7 @@ void init_()
   {
     led_arr[i]->setOn(500);
   }
-  randomSeed(analogRead(A0));
+  randomSeed(analogRead(6));
 
   pc.begin();
   matrix.begin(0x70);
@@ -204,6 +208,22 @@ void set_all_leds_off()
   for (int i = 0; i < NB_LEDS; i++)
   {
     led_arr[i]->setOff();
+  }
+}
+
+void set_all_leds_on()
+{
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    led_arr[i]->setOn();
+  }
+}
+
+void set_all_leds_on(int duration)
+{
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    led_arr[i]->setOn(duration);
   }
 }
 void update_leds()

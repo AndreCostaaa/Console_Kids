@@ -15,14 +15,13 @@ typedef enum GameStateEnum
   GAMING,
   SETUP_MIC,
   GAME_OVER_CROWN //Easter Egg
-}GameStateEnum;
-
+} GameStateEnum;
 
 typedef enum GameModeEnum
 {
   ONE_PLAYER,
   TWO_PLAYERS
-}GameModeEnum;
+} GameModeEnum;
 
 #define GOOD_REACTION_TIME 500
 #define BAD_REACTION_TIME 1000
@@ -33,8 +32,8 @@ typedef enum GameModeEnum
 #define MAX_DIFFICULTY 3
 #define MIN_DIFFICULTY 0
 
-#define P1 (uint8_t) 0
-#define P2 (uint8_t) 1
+#define P1 (uint8_t)0
+#define P2 (uint8_t)1
 
 GameProgressEnum reaction();
 GameProgressEnum four_in_a_row();

@@ -109,7 +109,7 @@ void init_()
   {
     led_arr[i]->setOn(500);
   }
-  randomSeed(analogRead(A0));
+  randomSeed(analogRead(6));
 
   pc.begin();
   matrix.begin(0x70);
@@ -185,6 +185,22 @@ void set_all_leds_off()
   for (int i = 0; i < 4; i++)
   {
     led_arr[i]->setOff();
+  }
+}
+
+void set_all_leds_on()
+{
+  for (int i = 0; i < 4; i++)
+  {
+    led_arr[i]->setOn();
+  }
+}
+
+void set_all_leds_on(int duration)
+{
+  for (int i = 0; i < 4; i++)
+  {
+    led_arr[i]->setOn(duration);
   }
 }
 void update_leds()

@@ -71,7 +71,7 @@ GameProgressEnum reaction()
     case START:
       if (start_timer.isDone())
       {
-        for(int i = 0; i < NB_LEDS; i++)
+        for (int i = 0; i < NB_LEDS; i++)
         {
           led_arr[i]->setOn(200);
         }
@@ -83,7 +83,7 @@ GameProgressEnum reaction()
       switch (game_mode)
       {
       case ONE_PLAYER:
-        if (getClapped())
+        if (getClapped() || btn != NONE)
         {
           reaction_time = millis() - start_time;
           Serial.print("One player-> reaction_time: ");
@@ -162,8 +162,8 @@ GameProgressEnum reaction()
       }
       else
       {
-        led_red.setOff();
-        led_green.setOn();
+        led_red.setOn();
+        led_green.setOff();
         led_yellow.setOff();
         led_blue.setOn();
       }
@@ -207,7 +207,7 @@ static void set_matrix_arr(uint8_t matrix_arr[8][8], GameModeEnum mode, int8_t d
     {
       for (int i = 0; i < MATRIX_ROWS; i++)
       {
-        for (int j = MATRIX_ROWS / 2; j < MATRIX_ROWS ; j++)
+        for (int j = MATRIX_ROWS / 2; j < MATRIX_ROWS; j++)
         {
           matrix_arr[i][j] = GREEN;
         }

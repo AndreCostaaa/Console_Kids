@@ -112,6 +112,22 @@ void set_all_leds_off()
     led_arr[i]->setOff();
   }
 }
+
+void set_all_leds_on()
+{
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    led_arr[i]->setOn();
+  }
+}
+
+void set_all_leds_on(int duration)
+{
+  for (int i = 0; i < NB_LEDS; i++)
+  {
+    led_arr[i]->setOn(duration);
+  }
+}
 void update_leds()
 {
   int8_t led_data = 0;
