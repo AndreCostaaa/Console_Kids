@@ -16,6 +16,7 @@ typedef enum
     MATRIX_GREEN = 0x03
 } ColorEnum;
 
+
 class PC_APP
 {
 private:    
@@ -40,7 +41,7 @@ private:
     HardwareSerial &_serial;
     bool _is_connected;
     char data_in[50];
-
+    static const uint8_t COMMUNICATION_BYTE_SIZE = 18;
 
 public:
     PC_APP(HardwareSerial &serial);

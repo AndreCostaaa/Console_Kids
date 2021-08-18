@@ -42,12 +42,17 @@ private:
     bool _is_connected;
     char data_in[50];
     static const uint8_t COMMUNICATION_BYTE_SIZE = 18;
-
+    bool _sentMatrixData;
+    bool _sentButtonData;
+    bool _sentLedData;
 public:
     PC_APP(HardwareSerial &serial);
     void begin();
     bool get_connected();
     void receive_data();
+    bool sentMatrixData();
+    bool sentButtonData();
+    bool sentLedData();
     //Set
     void set_matrix_position(int x, int y, ColorEnum color);
     void set_matrix(uint8_t data[8][8]);
@@ -59,6 +64,7 @@ public:
     void set_mic_idle();
     void set_leds(uint8_t data);
     void set_buttons(uint8_t data);
+    
     //Get
     //Extra feautures todo
 

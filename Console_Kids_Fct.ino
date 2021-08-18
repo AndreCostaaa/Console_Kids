@@ -1,5 +1,4 @@
 #include "Console_Kids.h"
-#include "FctAntirebond.h"
 #include "serial.h"
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -42,68 +41,41 @@ void init_()
 
 ButtonPressedEnum getButtonPressed()
 {
-  static byte btn_a;
-  static byte btn_b;
-  static byte btn_c;
-  static byte btn_d;
-  static Timer anti_rebond = Timer();
-  anti_rebond.set_auto_restart(true);
-  byte *btn_state[] = {&btn_a, &btn_b, &btn_c, &btn_d};
-  static int8_t old_btn_data = 0;
-  int8_t btn_data = 0;
-  ColorEnum btn_color[] = {CMD_RED, CMD_GREEN, CMD_ORANGE, CMD_BLUE};
-  if (!anti_rebond.get_started())
+  static uint8_t old_btn_data = 0;
+  uint8_t btn_data = 0;
+  int btn_pins[] = {BTN_A_PIN, BTN_B_PIN, BTN_C_PIN, BTN_D_PIN};
+  
+  for (int i = 0; i < NB_LEDS; i++)
   {
-    anti_rebond.start(10);
-  }
-  if (anti_rebond.isDone())
-  {
-    Antirebond(BTN_A_PIN, &btn_a, ACTIF_A_0);
-    Antirebond(BTN_B_PIN, &btn_b, ACTIF_A_0);
-    Antirebond(BTN_C_PIN, &btn_c, ACTIF_A_0);
-    Antirebond(BTN_D_PIN, &btn_d, ACTIF_A_0);
-    for (int i = 0; i < NB_LEDS; i++)
+    if (!digitalRead(btn_pins[i]))
     {
-      if (*(btn_state[i]) != INACTIF)
-      {
-        btn_data |= (1 << i);
-      }
-      else
-      {
-        btn_data &= ~(1 << i);
-      }
-    }
-    if (pc.get_connected())
-    {
-      if (btn_data != old_btn_data)
-      {
-        pc.set_buttons(btn_data);
-      }
-      old_btn_data = btn_data;
-    }
-    else
-    {
-      old_btn_data = -1;
-    }
-    if (btn_a == FLANC_ACTIF)
-    {
-      return BTN_A;
-    }
-    else if (btn_b == FLANC_ACTIF)
-    {
-      return BTN_B;
-    }
-    else if (btn_c == FLANC_ACTIF)
-    {
-      return BTN_C;
-    }
-    else if (btn_d == FLANC_ACTIF)
-    {
-      return BTN_D;
+      btn_data |= (1 << i);
+      
     }
   }
-  return NONE;
+  if (pc.get_connected())
+  {
+    if (btn_data != old_btn_data || !pc.sentButtonData())
+    {
+      pc.set_buttons(btn_data);
+    }
+  }
+  ButtonPressedEnum btnPressed = NONE;
+
+  for(uint8_t i = 0; i < NB_LEDS; i++)
+  {
+    uint8_t mask = 1 << i;
+    if(btn_data & mask && !(old_btn_data & mask))
+    { 
+
+      btnPressed = (ButtonPressedEnum) i;
+    }
+  }
+  
+  old_btn_data = btn_data;
+  return btnPressed;
 }
+
 
 void set_all_leds_off()
 {
@@ -130,8 +102,8 @@ void set_all_leds_on(int duration)
 }
 void update_leds()
 {
-  int8_t led_data = 0;
-  static int8_t old_led_data = 0;
+  uint8_t led_data = 0;
+  static uint8_t old_led_data = 0;
   for (int i = 0; i < NB_LEDS; i++)
   {
     led_arr[i]->update();
@@ -139,15 +111,11 @@ void update_leds()
   }
   if (pc.get_connected())
   {
-    if (led_data != old_led_data)
+    if (led_data != old_led_data || !pc.sentLedData())
     {
       pc.set_leds(led_data);
     }
     old_led_data = led_data;
-  }
-  else
-  {
-    old_led_data = -1;
   }
 }
 
@@ -158,6 +126,7 @@ void set_matrix(uint8_t data[8][8])
   matrix.clear();
   matrix.setRotation(0);
   bool send_data_to_pc = false;
+  static bool sent_first = false;
   for (int i = 0; i < 8; i++)
   {
     for (int j = 0; j < 8; j++)
@@ -170,24 +139,26 @@ void set_matrix(uint8_t data[8][8])
       }
     }
   }
-  if (pc.get_connected() && send_data_to_pc)
+  if (pc.get_connected() && (send_data_to_pc || !pc.sentMatrixData()))
   {
     pc.set_matrix(data);
+    sent_first = true;
   }
   matrix.writeDisplay();
 }
 void set_crown(uint8_t data[8][8])
 {
   const uint8_t crown[8][8] =
-      {
-          {0, 0, 3, 3, 3, 3, 0, 0},
-          {0, 3, 0, 0, 0, 0, 3, 0},
-          {3, 0, 3, 0, 0, 3, 0, 3},
-          {3, 0, 0, 0, 0, 0, 0, 3},
-          {3, 0, 3, 0, 0, 3, 0, 3},
-          {3, 0, 0, 3, 3, 0, 0, 3},
-          {0, 3, 0, 0, 0, 0, 3, 0},
-          {0, 0, 3, 3, 3, 3, 0, 0}};
+  {
+    {0, 0, 3, 3, 3, 3, 0, 0},
+    {0, 3, 0, 0, 0, 0, 3, 0},
+    {3, 0, 3, 0, 0, 3, 0, 3},
+    {3, 0, 0, 0, 0, 0, 0, 3},
+    {3, 0, 3, 0, 0, 3, 0, 3},
+    {3, 0, 0, 3, 3, 0, 0, 3},
+    {0, 3, 0, 0, 0, 0, 3, 0},
+    {0, 0, 3, 3, 3, 3, 0, 0}
+  };
   for (int i = 0; i < 8; i++)
   {
     for (int j = 0; j < 8; j++)

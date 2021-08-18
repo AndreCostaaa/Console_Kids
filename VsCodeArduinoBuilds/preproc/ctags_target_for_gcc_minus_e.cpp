@@ -18,6 +18,7 @@ void loop()
   static uint8_t game_index = 0;
   ButtonPressedEnum btn = NONE;
   pc.receive_data();
+  //btn = pc.receive_data();
   btn = getButtonPressed();
   switch (state)
   {
@@ -68,7 +69,7 @@ void loop()
      Complements the use of setOn(duration)
 
   */
-# 67 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
+# 68 "u:\\P. Console Kids\\Prog\\Console_Kids\\Console_Kids.ino"
   update_leds();
   set_matrix(matrix_arr);
 }

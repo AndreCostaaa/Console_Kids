@@ -32,9 +32,8 @@ GameProgressEnum sequence()
     switch (game_state)
     {
     case START:
-
-      //Initialize array
       game_over = false;
+      //Initialize array
       memset(sequence_arr, -1, sizeof(sequence_arr[0]) * PLAYS_MAX_SEQUENCE);
       for (int i = 0; i < NB_LEDS; i++)
       {
@@ -134,15 +133,15 @@ GameProgressEnum sequence()
       {
         if (time_to_play.isDone())
         {
-          led_red.setOn(250);
-          game_state = GAME_OVER;
+          set_all_leds_on(500);
+          game_over = true;
         }
         if (btn != NONE)
         {
           time_to_play.restart();
           if (sequence_arr[index] == (int8_t)btn)
           {
-            //led_green.setOn(200);
+            led_green.setOn(200);
             index++;
           }
           else
@@ -164,7 +163,7 @@ GameProgressEnum sequence()
       //Replay the sequence
       if (new_state)
       {
-        index = plays;
+        //index = plays;
         timer_led.start(0);
       }
       if (!led_arr[sequence_arr[index]]->get())

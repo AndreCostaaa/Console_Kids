@@ -17,6 +17,7 @@ void loop()
   static uint8_t game_index = 0;
   ButtonPressedEnum btn = NONE;
   pc.receive_data();
+  //btn = pc.receive_data();
   btn = getButtonPressed();
   switch (state)
   {
